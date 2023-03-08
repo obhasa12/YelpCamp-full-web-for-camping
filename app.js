@@ -5,8 +5,8 @@ const Joi = require('joi');
 const methodOverride = require('method-override');
 const mongoose = require('mongoose');
 const Campground = require('./models/campground');
-const { campgroundSchema } = require('./schema')
-
+const { campgroundSchema, reviewSchema } = require('./schema');
+const Review = require('./models/review')
 const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError')
 
@@ -38,6 +38,16 @@ const validateCammpground = (req, res, next) => {
     }
 }
 
+const validateReview = (req ,res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if(error){
+        const msg = error.details.map(err => err.message).join(',')
+        throw new ExpressError (msg, 404)
+    }else{
+        next()
+    }
+}
+
 app.get('/', (req, res) => {
     res.render('home')
 });
@@ -60,7 +70,8 @@ app.post('/campgrounds', validateCammpground, catchAsync(async (req, res) => {
 
 app.get('/campgrounds/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
-    const campground = await Campground.findById(id);
+    const campground = await Campground.findById(id).populate('reviews');
+    console.log(campground)
     res.render('campgrounds/show', { campground });
 }));
 
@@ -81,6 +92,15 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
     const campground = await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds')
 }));
+
+app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`)
+}))
 
 app.all('*', (req, res, next) => {
     next(new ExpressError("Page not found", 404))
