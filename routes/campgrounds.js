@@ -4,6 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 const ExpressError = require('../utils/ExpressError');
 const Campground = require('../models/campground');
 const { campgroundSchema } = require('../schema');
+const isLoggedIn = require('../middleware')
 
 const validateCammpground = (req, res, next) => {
     const { error } = campgroundSchema.validate(req.body);
@@ -20,8 +21,12 @@ router.get('/', catchAsync(async (req, res) => {
     res.render('campgrounds/index', { campgrounds })
  }));
  
- router.get('/new', (req, res) => {
-     res.render('campgrounds/new')
+ router.get('/new', isLoggedIn, (req, res) => {
+    // if(!req.isAuthenticated()){
+    //     req.flash('error', "you must be signed in!!");
+    //     return res.redirect('/login');
+    // };
+    res.render('campgrounds/new')
  });
  
  router.post('/', validateCammpground, catchAsync(async (req, res) => {
@@ -43,14 +48,14 @@ router.get('/', catchAsync(async (req, res) => {
      res.render('campgrounds/show', { campground });
  }));
  
- router.get('/:id/edit', catchAsync(async (req, res) => {
+ router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
      const { id } = req.params;
      const campground = await Campground.findById(id)
      if(!campground){
         req.flash('error', "Cannot find that Campground!")
         res.redirect('/campgrounds')
      }
-     res.flash('success', " Successfully updated campground!")
+     req.flash('success', " Successfully updated campground!")
      res.render('campgrounds/edit', { campground })
  }));
  
