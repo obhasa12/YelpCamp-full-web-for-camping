@@ -20,7 +20,8 @@ router.route('/:id')
     .get(catchAsync(campgrounds.showCampground))
     .put(isLoggedIn, 
         isAuthor, 
-        validateCampground, 
+        upload.array('image'), 
+        validateCampground,
         catchAsync(campgrounds.updateCampground))
     .delete(isLoggedIn, 
         isAuthor, 
