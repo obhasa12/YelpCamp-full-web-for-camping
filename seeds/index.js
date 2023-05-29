@@ -23,13 +23,13 @@ const seedDB = async() => {
         const camp = new Campground({
             author: '642e72a497c9bbb3dc99131a', 
             // location: `${cities[random1000].city}, ${cities[random1000].state}`,
-            location: "Jakarta, Indonesia",
+            location: `${cities[random1000].city}, ${cities[random1000].state}`,
             title: `${sample(descriptors)} ${sample(places)}`,
             description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat officiis praesentium a ab earum doloremque aspernatur blanditiis eos repudiandae, iure, alias provident atque, quia commodi numquam placeat quae. Magni, perspiciatis.',
             price,
             geometry : {
                 type: "Point",
-                coordinates: [106.827183, -6.1753942]
+                coordinates: [cities[random1000].longitude, cities[random1000].latitude]
             },
             image: [{
                 url: 'https://res.cloudinary.com/dr4yxefne/image/upload/v1683010531/YelpCamp/pbyiyilvhib38s87h5i1.jpg',
