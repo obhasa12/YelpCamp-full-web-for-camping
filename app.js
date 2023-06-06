@@ -2,7 +2,7 @@ if(process.env.NODE_DEV !== 'production'){
     require('dotenv').config();
 }
 
-
+// mongodb+srv://our-first-user:<password>@cluster0.minuxvm.mongodb.net/?retryWrites=true&w=majority
 
 const express = require('express');
 const path = require('path');
@@ -22,8 +22,11 @@ const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
 
 const mongoSanitize = require('express-mongo-sanitize');
+const dbUrl = process.env.DB_URL;
 
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp');
+// mongoose.connect(dbUrl);
+
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, "connection error:"));
